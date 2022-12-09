@@ -213,29 +213,12 @@
 
 (define (smallest-small-size-larger-than root x)
   (let loop ((children (car root))
-             (found (cdr root)))
+             (found (if (>= (cdr root) x) (cdr root) +inf.0)))
     (if (null? children)
       found
-      (let ((childsize (cdr (car children))))
-        (print "childsize: " childsize)
-        (cond
-          ((>= childsize x)
-           (loop (cdr children)
-                 (min childsize found)))
-          (else (loop (cdr children)
-                      found)))))))
+      (loop (cdr children)
+            (min found (smallest-small-size-larger-than (car children) x))))))
 
-(define (sum-small-sizes root)
-  (let loop ((children (car root))
-             (acc-size 0))
-    (cond
-      ((null? children)
-       (+ acc-size
-          (if (< (cdr root) 100000)
-            (cdr root)
-            0)))
-      (else (loop (cdr children)
-                  (+ acc-size (sum-small-sizes (car children))))))))
 
 (define (main args)
   (let* ((loc (read-tree-from-file (open-input-file (car args))))
@@ -246,6 +229,6 @@
     ;(print "sizes: " sizes)
     ;(print "needed: " needed)
     ;(print "root size: " (cdr sizes))
-    (print (smallest-small-size-larger-than sizes (- 70000000 (cdr sizes))))
+    (print (smallest-small-size-larger-than sizes needed))
   ))
 
